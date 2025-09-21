@@ -45,4 +45,9 @@ export class RoomController {
 		}
 		return room;
 	}
+
+	@Get('all')
+	async findAll(): Promise<RoomModel[]> {
+		return this.roomService.findAll();
+	}
 }

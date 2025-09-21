@@ -12,6 +12,10 @@ export class RoomModel {
 	@Prop({ required: true })
 	_id: string;
 	@Prop({ required: true })
+	seaView: boolean;
+	@Prop({ required: true })
+	roomNumber: number;
+	@Prop({ required: true })
 	name: string;
 	@Prop({ required: true })
 	type: RoomType;

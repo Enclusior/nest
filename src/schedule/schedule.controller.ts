@@ -22,12 +22,15 @@ export class ScheduleController {
 		return this.scheduleService.create(dto);
 	}
 	@Delete(':id')
-	async delete(@Param('id') id: string): Promise<ScheduleModel | null> {
+	async delete(@Param('id') id: Omit<ScheduleModel, '_id'>): Promise<ScheduleModel | null> {
 		return this.scheduleService.delete(id);
 	}
 
 	@Patch(':id')
-	async update(@Param('id') id: string, @Body() dto: ScheduleDto): Promise<ScheduleModel | null> {
+	async update(
+		@Param('id') id: Omit<ScheduleModel, '_id'>,
+		@Body() dto: ScheduleDto,
+	): Promise<ScheduleModel | null> {
 		const result = await this.scheduleService.update(id, dto);
 		if (!result) {
 			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);

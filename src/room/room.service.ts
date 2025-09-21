@@ -21,4 +21,7 @@ export class RoomService {
 	async findByRoomId(id: Omit<RoomModel, '_id'>): Promise<RoomDocument | null> {
 		return this.roomModel.findById(id).exec();
 	}
+	async findAll(): Promise<RoomDocument[]> {
+		return this.roomModel.find().exec();
+	}
 }
