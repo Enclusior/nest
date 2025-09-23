@@ -28,9 +28,6 @@ export class RoomController {
 	@Get('all')
 	async findAll(): Promise<RoomModel[]> {
 		const result = await this.roomService.findAll();
-		if (!result) {
-			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
-		}
 		return result;
 	}
 

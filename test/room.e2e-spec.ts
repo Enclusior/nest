@@ -66,17 +66,25 @@ describe('RoomController (e2e)', () => {
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: ROOM_NOT_FOUND });
 	});
 	it('/room/all (GET) - success', () => {
-		return request(app.getHttpServer()).get('/room/all').expect(200);
-	});
-	it('/room/all (GET) - failed', () => {
 		return request(app.getHttpServer())
-			.get('/room/' + new Types.ObjectId().toHexString())
-			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: ROOM_NOT_FOUND });
+			.get('/room/all')
+			.expect(200)
+			.then(({ body }: { body: RoomModel[] }) => {
+				expect(body.length).toBe(1);
+			});
 	});
 	it('/room/delete/:id (DELETE) - success', () => {
 		return request(app.getHttpServer())
 			.delete('/room/' + createdId)
 			.expect(200);
+	});
+	it('/room/all (GET) - failed', () => {
+		return request(app.getHttpServer())
+			.get('/room/all')
+			.expect(200)
+			.then(({ body }: { body: RoomModel[] }) => {
+				expect(body.length).toBe(0);
+			});
 	});
 	it('/room/delete/:id (DELETE) - failed', () => {
 		return request(app.getHttpServer())

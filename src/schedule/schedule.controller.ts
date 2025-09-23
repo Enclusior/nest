@@ -28,9 +28,6 @@ export class ScheduleController {
 	@Get('all')
 	async findAll(): Promise<ScheduleModel[]> {
 		const result = await this.scheduleService.findAll();
-		if (!result) {
-			throw new HttpException(SCHEDULE_NOT_FOUND, HttpStatus.NOT_FOUND);
-		}
 		return result;
 	}
 	@Delete(':id')

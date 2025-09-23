@@ -68,12 +68,12 @@ describe('ScheduleController (e2e)', () => {
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: SCHEDULE_NOT_FOUND });
 	});
 	it('/schedule/all (GET) - success', () => {
-		return request(app.getHttpServer()).get('/schedule/all').expect(200);
-	});
-	it('/schedule/all (GET) - failed', () => {
 		return request(app.getHttpServer())
-			.get('/schedule/' + new Types.ObjectId().toHexString())
-			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: SCHEDULE_NOT_FOUND });
+			.get('/schedule/all')
+			.expect(200)
+			.then(({ body }: { body: ScheduleModel[] }) => {
+				expect(body.length).toBe(1);
+			});
 	});
 	it('/schedule/byRoom/:roomId (GET) - success', () => {
 		return request(app.getHttpServer())
@@ -96,6 +96,14 @@ describe('ScheduleController (e2e)', () => {
 		return request(app.getHttpServer())
 			.delete('/schedule/' + createdId)
 			.expect(200);
+	});
+	it('/schedule/all (GET) - failed', () => {
+		return request(app.getHttpServer())
+			.get('/schedule/all')
+			.expect(200)
+			.then(({ body }: { body: ScheduleModel[] }) => {
+				expect(body.length).toBe(0);
+			});
 	});
 	it('/schedule/delete/:id (DELETE) - failed', () => {
 		return request(app.getHttpServer())
