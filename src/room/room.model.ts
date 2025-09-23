@@ -9,7 +9,6 @@ export type RoomDocument = HydratedDocument<RoomModel>;
 
 @Schema({ timestamps: true })
 export class RoomModel {
-	@Prop({ required: true })
 	_id: string;
 	@Prop({ required: true })
 	seaView: boolean;
