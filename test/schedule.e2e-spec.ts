@@ -6,11 +6,11 @@ import { AppModule } from '../src/app.module';
 import { ScheduleModel } from '../src/schedule/schedule.model';
 import { SCHEDULE_NOT_FOUND } from '../src/schedule/schedule-constants';
 import { disconnect, Types } from 'mongoose';
-import { ROOM_NOT_FOUND } from '../src/room/room-constants';
 
 const roomId = new Types.ObjectId().toHexString();
+const failedId = '13414141';
 const scheduleTestDto = {
-	date: new Date(),
+	date: new Date().toISOString(),
 	roomId,
 };
 const scheduleTestDtoFailed = {
@@ -57,6 +57,12 @@ describe('ScheduleController (e2e)', () => {
 			.send(scheduleTestDto)
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: SCHEDULE_NOT_FOUND });
 	});
+	it('/schedule/:id (PATCH) - failed with wrong id', () => {
+		return request(app.getHttpServer())
+			.patch('/schedule/' + failedId)
+			.send(scheduleTestDto)
+			.expect(400);
+	});
 	it('/schedule/:id (GET) - success', () => {
 		return request(app.getHttpServer())
 			.get('/schedule/' + createdId)
@@ -66,6 +72,11 @@ describe('ScheduleController (e2e)', () => {
 		return request(app.getHttpServer())
 			.get('/schedule/' + new Types.ObjectId().toHexString())
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: SCHEDULE_NOT_FOUND });
+	});
+	it('/schedule/:id (GET) - failed with wrong id', () => {
+		return request(app.getHttpServer())
+			.get('/schedule/' + failedId)
+			.expect(400);
 	});
 	it('/schedule/all (GET) - success', () => {
 		return request(app.getHttpServer())
@@ -83,7 +94,11 @@ describe('ScheduleController (e2e)', () => {
 				expect(body.length).toBe(1);
 			});
 	});
-
+	it('/schedule/byRoom/:roomId (GET) - failed with wrong id', () => {
+		return request(app.getHttpServer())
+			.get('/schedule/byRoom/' + failedId)
+			.expect(400);
+	});
 	it('/schedule/byRoom/:roomId (GET) - failed', () => {
 		return request(app.getHttpServer())
 			.get('/schedule/byRoom/' + new Types.ObjectId().toHexString())
@@ -109,6 +124,11 @@ describe('ScheduleController (e2e)', () => {
 		return request(app.getHttpServer())
 			.delete('/schedule/' + new Types.ObjectId().toHexString())
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: SCHEDULE_NOT_FOUND });
+	});
+	it('/schedule/delete/:id (DELETE) - failed with wrong id', () => {
+		return request(app.getHttpServer())
+			.delete('/schedule/' + failedId)
+			.expect(400);
 	});
 	afterAll(async () => {
 		await disconnect();
