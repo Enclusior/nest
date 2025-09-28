@@ -5,7 +5,6 @@ export type ScheduleDocument = HydratedDocument<ScheduleModel>;
 
 @Schema()
 export class ScheduleModel {
-	@Prop({ required: true })
 	_id: string;
 	@Prop({ required: true })
 	date: Date;

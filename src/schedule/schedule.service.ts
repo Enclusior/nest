@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { ScheduleDocument, ScheduleModel } from './schedule.model';
+import { ScheduleDocument } from './schedule.model';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ScheduleDto } from './dto/schedule.dto';
@@ -21,17 +21,17 @@ export class ScheduleService {
 		return this.scheduleModel.create(dto);
 	}
 
-	async delete(id: Omit<ScheduleModel, '_id'>): Promise<ScheduleDocument | null> {
+	async delete(id: string): Promise<ScheduleDocument | null> {
 		return this.scheduleModel.findByIdAndDelete(id).exec();
 	}
 
-	async update(id: Omit<ScheduleModel, '_id'>, dto: ScheduleDto): Promise<ScheduleDocument | null> {
+	async update(id: string, dto: ScheduleDto): Promise<ScheduleDocument | null> {
 		return this.scheduleModel.findByIdAndUpdate(id, dto, { new: true }).exec();
 	}
-	async findByScheduleId(id: Omit<ScheduleModel, '_id'>): Promise<ScheduleDocument | null> {
+	async findByScheduleId(id: string): Promise<ScheduleDocument | null> {
 		return this.scheduleModel.findById(id).exec();
 	}
-	async findByRoomId(roomId: Omit<ScheduleModel, 'roomId'>): Promise<ScheduleDocument[]> {
+	async findByRoomId(roomId: string): Promise<ScheduleDocument[]> {
 		return this.scheduleModel.find({ roomId }).exec();
 	}
 
