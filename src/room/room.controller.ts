@@ -8,22 +8,29 @@ import {
 	Param,
 	Patch,
 	Post,
+	UseGuards,
 	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common';
 import { RoomDto } from './dto/room.dto';
-import { RoomModel } from './room.model';
+import { RoomDocument } from './room.model';
 import { RoomService } from './room.service';
 import { ROOM_CREATION_FAILED, ROOM_NOT_FOUND } from './room-constants';
 import { IdDto } from '../common/dto/id.dto';
+import { UserRole } from '../user/user.model';
+import { Roles } from '../decorators/role.decorator';
+import { JwtAuthGuard } from '../guards/jwt.guard';
+import { RolesGuard } from '../guards/role.guard';
 
 @Controller('room')
 export class RoomController {
 	constructor(private readonly roomService: RoomService) {}
 
 	@Post('create')
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(UserRole.ADMIN)
 	@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-	async create(@Body() dto: RoomDto): Promise<RoomModel> {
+	async create(@Body() dto: RoomDto): Promise<RoomDocument> {
 		if (!dto.seaView || !dto.roomNumber || !dto.name || !dto.type || !dto.price) {
 			throw new HttpException(ROOM_CREATION_FAILED, HttpStatus.BAD_REQUEST);
 		}
@@ -31,14 +38,17 @@ export class RoomController {
 	}
 
 	@Get('all')
-	async findAll(): Promise<RoomModel[]> {
+	@UseGuards(JwtAuthGuard)
+	async findAll(): Promise<RoomDocument[]> {
 		const result = await this.roomService.findAll();
 		return result;
 	}
 
 	@Delete(':id')
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(UserRole.ADMIN)
 	@UsePipes(new ValidationPipe())
-	async delete(@Param() params: IdDto): Promise<RoomModel | null> {
+	async delete(@Param() params: IdDto): Promise<RoomDocument | null> {
 		const result = await this.roomService.delete(params.id);
 		if (!result) {
 			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -48,7 +58,9 @@ export class RoomController {
 
 	@Patch(':id')
 	@UsePipes(new ValidationPipe())
-	async update(@Param() params: IdDto, @Body() dto: RoomDto): Promise<RoomModel | null> {
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(UserRole.ADMIN)
+	async update(@Param() params: IdDto, @Body() dto: RoomDto): Promise<RoomDocument | null> {
 		const result = await this.roomService.update(params.id, dto);
 		if (!result) {
 			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -56,8 +68,9 @@ export class RoomController {
 		return result;
 	}
 	@Get(':id')
+	@UseGuards(JwtAuthGuard)
 	@UsePipes(new ValidationPipe())
-	async findByRoomId(@Param() params: IdDto): Promise<RoomModel | null> {
+	async findByRoomId(@Param() params: IdDto): Promise<RoomDocument | null> {
 		const room = await this.roomService.findByRoomId(params.id);
 		if (!room) {
 			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
