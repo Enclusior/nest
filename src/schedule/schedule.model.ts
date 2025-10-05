@@ -3,7 +3,7 @@ import { HydratedDocument, Schema as MSchema } from 'mongoose';
 
 export type ScheduleDocument = HydratedDocument<ScheduleModel>;
 
-@Schema()
+@Schema({ timestamps: true, collection: 'schedule' })
 export class ScheduleModel {
 	_id: string;
 	@Prop({ required: true })

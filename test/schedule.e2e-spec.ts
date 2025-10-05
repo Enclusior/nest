@@ -22,6 +22,11 @@ const scheduleTestDtoFailed = {
 	price: 100,
 };
 
+const statisticsTestDto = {
+	month: 1,
+	year: 2025,
+};
+
 describe('ScheduleController (e2e)', () => {
 	let app: INestApplication<App>;
 	let createdId: string;
@@ -137,6 +142,19 @@ describe('ScheduleController (e2e)', () => {
 			.delete('/schedule/' + createdId)
 			.set('Authorization', `Bearer ${token}`)
 			.expect(200);
+	});
+	it('/schedule/statistics (GET) - success', () => {
+		return request(app.getHttpServer())
+			.post('/schedule/statistics')
+			.send(statisticsTestDto)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200);
+	});
+	it('/schedule/statistics (GET) - failed', () => {
+		return request(app.getHttpServer())
+			.post('/schedule/statistics')
+			.send(statisticsTestDto)
+			.expect(401);
 	});
 	it('/schedule/all (GET) - failed', () => {
 		return request(app.getHttpServer())

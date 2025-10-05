@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	HttpException,
 	HttpStatus,
 	Param,
@@ -23,6 +24,8 @@ import { Roles } from '../decorators/role.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { RolesGuard } from '../guards/role.guard';
 import { UserRole } from '../user/user.model';
+import { StatisticsDto } from './dto/statistics.dto';
+import { StatisticsResponse } from './types/statistics.types';
 
 @Controller('schedule')
 export class ScheduleController {
@@ -86,5 +89,13 @@ export class ScheduleController {
 			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 		return result;
+	}
+	@HttpCode(200)
+	@Post('statistics')
+	@UseGuards(JwtAuthGuard)
+	@Roles(UserRole.ADMIN)
+	@UsePipes(new ValidationPipe())
+	async getStatistics(@Body() dto: StatisticsDto): Promise<StatisticsResponse[]> {
+		return this.scheduleService.getStatistics(dto.month, dto.year);
 	}
 }
