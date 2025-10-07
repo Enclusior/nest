@@ -7,7 +7,7 @@ export enum RoomType {
 }
 export type RoomDocument = HydratedDocument<RoomModel>;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, collection: 'rooms' })
 export class RoomModel {
 	_id: string;
 	@Prop({ required: true })

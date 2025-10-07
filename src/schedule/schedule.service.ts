@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ScheduleDto } from './dto/schedule.dto';
 import { SCHEDULE_ALREADY_EXISTS } from './schedule-constants';
+import { StatisticsResponse } from './types/statistics.types';
 
 @Injectable()
 export class ScheduleService {
@@ -37,5 +38,43 @@ export class ScheduleService {
 
 	async findAll(): Promise<ScheduleDocument[]> {
 		return this.scheduleModel.find().exec();
+	}
+	async getStatistics(month: number, year: number): Promise<StatisticsResponse[]> {
+		return await this.scheduleModel.aggregate([
+			{
+				$match: {
+					date: { $gte: new Date(year, month - 1, 1), $lt: new Date(year, month, 1) },
+				},
+			},
+			{
+				$group: {
+					_id: '$roomId',
+					bookedDays: { $sum: 1 },
+				},
+			},
+			{
+				$lookup: {
+					from: 'rooms',
+					localField: '_id',
+					foreignField: '_id',
+					as: 'room',
+				},
+			},
+			{
+				$unwind: '$room',
+			},
+			{
+				$project: {
+					_id: 0,
+					roomNumber: '$room.roomNumber',
+					bookedDays: 1,
+				},
+			},
+			{
+				$sort: {
+					roomNumber: 1,
+				},
+			},
+		]);
 	}
 }
