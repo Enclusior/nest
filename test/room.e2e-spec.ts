@@ -14,12 +14,16 @@ const loginDto: AuthDto = {
 };
 
 const failedId = '13414141';
+const imageTestDto = {
+	image: [{ url: '/image.jpg', name: 'image.jpg' }],
+};
 const roomTestDto = {
 	seaView: true,
 	roomNumber: 1,
 	name: 'Room 1',
 	type: RoomType.Single,
 	price: 100,
+	image: [],
 	available: true,
 };
 const roomTestDtoFailed = {
@@ -57,6 +61,7 @@ describe('RoomController (e2e)', () => {
 				expect(createdId).toBeDefined();
 			});
 	});
+
 	it('/room/create (POST) - failed', () => {
 		return request(app.getHttpServer())
 			.post('/room/create')
@@ -64,6 +69,7 @@ describe('RoomController (e2e)', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(400);
 	});
+
 	it('/room/:id (PATCH) - success', () => {
 		return request(app.getHttpServer())
 			.patch('/room/' + createdId)
@@ -71,6 +77,7 @@ describe('RoomController (e2e)', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(200);
 	});
+
 	it('/room/:id (PATCH) - failed', () => {
 		return request(app.getHttpServer())
 			.patch('/room/' + new Types.ObjectId().toHexString())
@@ -78,6 +85,7 @@ describe('RoomController (e2e)', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: ROOM_NOT_FOUND });
 	});
+
 	it('/room/:id (PATCH) - failed with wrong id', () => {
 		return request(app.getHttpServer())
 			.patch('/room/' + failedId)
@@ -85,24 +93,74 @@ describe('RoomController (e2e)', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(400);
 	});
+
 	it('/room/:id (GET) - success', () => {
 		return request(app.getHttpServer())
 			.get('/room/' + createdId)
 			.set('Authorization', `Bearer ${token}`)
 			.expect(200);
 	});
+
 	it('/room/:id (GET) - failed', () => {
 		return request(app.getHttpServer())
 			.get('/room/' + new Types.ObjectId().toHexString())
 			.set('Authorization', `Bearer ${token}`)
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: ROOM_NOT_FOUND });
 	});
+
 	it('/room/:id (GET) - failed with wrong id', () => {
 		return request(app.getHttpServer())
 			.get('/room/' + failedId)
 			.set('Authorization', `Bearer ${token}`)
 			.expect(400);
 	});
+
+	it('/room/:id/attach-images (PATCH) - success', () => {
+		return request(app.getHttpServer())
+			.patch('/room/' + createdId + '/attach-images')
+			.send(imageTestDto)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200);
+	});
+
+	it('/room/:id/attach-images (PATCH) - failed with wrong id', () => {
+		return request(app.getHttpServer())
+			.patch('/room/' + failedId + '/attach-images')
+			.send(imageTestDto)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(400);
+	});
+
+	it('/room/:id/attach-images (PATCH) - failed with wrong image', () => {
+		return request(app.getHttpServer())
+			.patch('/room/' + createdId + '/attach-images')
+			.send([{ url: '1' }])
+			.set('Authorization', `Bearer ${token}`)
+			.expect(400);
+	});
+
+	it('/room/:id/deattach-images (PATCH) - success', () => {
+		return request(app.getHttpServer())
+			.patch('/room/' + createdId + '/deattach-images')
+			.send(imageTestDto)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200);
+	});
+
+	it('/room/:id/deattach-all-images (DELETE) - success', () => {
+		return request(app.getHttpServer())
+			.delete('/room/' + createdId + '/deattach-all-images')
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200);
+	});
+
+	it('/room/:id/deattach-all-images (DELETE) - failed with wrong id', () => {
+		return request(app.getHttpServer())
+			.delete('/room/' + failedId + '/deattach-all-images')
+			.set('Authorization', `Bearer ${token}`)
+			.expect(400);
+	});
+
 	it('/room/all (GET) - success', () => {
 		return request(app.getHttpServer())
 			.get('/room/all')
@@ -118,12 +176,14 @@ describe('RoomController (e2e)', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(200);
 	});
+
 	it('/room/delete/:id (DELETE) - failed with wrong id', () => {
 		return request(app.getHttpServer())
 			.delete('/room/' + failedId)
 			.set('Authorization', `Bearer ${token}`)
 			.expect(400);
 	});
+
 	it('/room/all (GET) - failed', () => {
 		return request(app.getHttpServer())
 			.get('/room/all')
@@ -133,17 +193,20 @@ describe('RoomController (e2e)', () => {
 				expect(body.length).toBe(0);
 			});
 	});
+
 	it('/room/delete/:id (DELETE) - failed', () => {
 		return request(app.getHttpServer())
 			.delete('/room/' + new Types.ObjectId().toHexString())
 			.set('Authorization', `Bearer ${token}`)
 			.expect(404, { statusCode: HttpStatus.NOT_FOUND, message: ROOM_NOT_FOUND });
 	});
+
 	it('/room/delete/:id (DELETE) - Unauthorized', () => {
 		return request(app.getHttpServer())
 			.delete('/room/' + createdId)
 			.expect(401);
 	});
+
 	afterAll(async () => {
 		await disconnect();
 	});
