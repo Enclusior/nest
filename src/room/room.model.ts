@@ -22,7 +22,7 @@ export class RoomModel {
 	type: RoomType;
 	@Prop({ required: true })
 	price: number;
-	@Prop({ type: () => [Object] })
+	@Prop({ type: () => [Object], default: [] })
 	image: ImageType[];
 	@Prop({ required: true, default: true })
 	available: boolean;
