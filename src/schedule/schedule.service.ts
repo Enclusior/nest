@@ -5,11 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ScheduleDto } from './dto/schedule.dto';
 import { SCHEDULE_ALREADY_EXISTS } from './schedule-constants';
 import { StatisticsResponse } from './types/statistics.types';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
 export class ScheduleService {
 	constructor(
 		@InjectModel('ScheduleModel') private readonly scheduleModel: Model<ScheduleDocument>,
+		private readonly telegramService: TelegramService,
 	) {}
 
 	async create(dto: ScheduleDto): Promise<ScheduleDocument> {
@@ -19,6 +21,7 @@ export class ScheduleService {
 		if (existing) {
 			throw new HttpException(SCHEDULE_ALREADY_EXISTS, 400);
 		}
+		await this.telegramService.sendMessage(`New schedule created: ${dto.date} ${dto.roomId}`);
 		return this.scheduleModel.create(dto);
 	}
 
