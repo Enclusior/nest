@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	HttpException,
 	HttpStatus,
 	Param,
@@ -21,6 +22,7 @@ import { UserRole } from '../user/user.model';
 import { Roles } from '../decorators/role.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { RolesGuard } from '../guards/role.guard';
+import { AttachImageToRoomDto } from './dto/attachImageToRoom.dto';
 
 @Controller('room')
 export class RoomController {
@@ -35,6 +37,50 @@ export class RoomController {
 			throw new HttpException(ROOM_CREATION_FAILED, HttpStatus.BAD_REQUEST);
 		}
 		return this.roomService.create(dto);
+	}
+
+	@Patch(':id/attach-images')
+	@HttpCode(200)
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(UserRole.ADMIN)
+	@UsePipes(new ValidationPipe())
+	async attachImage(
+		@Param() params: IdDto,
+		@Body() dto: AttachImageToRoomDto,
+	): Promise<RoomDocument> {
+		const result = await this.roomService.attachImage(params.id, dto);
+		if (!result) {
+			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
+		}
+		return result;
+	}
+
+	@Patch(':id/deattach-images')
+	@HttpCode(200)
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(UserRole.ADMIN)
+	@UsePipes(new ValidationPipe())
+	async deattachImage(
+		@Param() params: IdDto,
+		@Body() dto: AttachImageToRoomDto,
+	): Promise<RoomDocument> {
+		const result = await this.roomService.deattachImage(params.id, dto);
+		if (!result) {
+			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
+		}
+		return result;
+	}
+
+	@Delete(':id/deattach-all-images')
+	@UseGuards(JwtAuthGuard, RolesGuard)
+	@Roles(UserRole.ADMIN)
+	@UsePipes(new ValidationPipe())
+	async deattachAllImage(@Param() params: IdDto): Promise<RoomDocument> {
+		const result = await this.roomService.deattachAllImage(params.id);
+		if (!result) {
+			throw new HttpException(ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
+		}
+		return result;
 	}
 
 	@Get('all')
