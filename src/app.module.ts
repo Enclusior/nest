@@ -9,6 +9,8 @@ import { getMongoConfig } from './configs/mongo.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
+import { TelegramModule } from './telegram/telegram.module';
+import { getTelegramConfig } from './configs/telegram.config';
 
 @Module({
 	imports: [
@@ -19,6 +21,11 @@ import { FilesModule } from './files/files.module';
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: getMongoConfig,
+		}),
+		TelegramModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: getTelegramConfig,
+			inject: [ConfigService],
 		}),
 		UserModule,
 		AuthModule,
