@@ -26,6 +26,7 @@ export class ScheduleService {
 	}
 
 	async delete(id: string): Promise<ScheduleDocument | null> {
+		await this.telegramService.sendMessage(`Schedule deleted: ${id}`);
 		return this.scheduleModel.findByIdAndDelete(id).exec();
 	}
 
